@@ -87,3 +87,15 @@ def update_quantity(request):
     
     except Exception as e:
         return Response({'error':str(e)},status=400)
+
+@api_view(['POST'])
+def delete_item(request):
+    try:
+        cartitem_id=request.data.get('item_id')
+        cartitem=CartItem.objects.get(id=cartitem_id)
+        cartitem.delete()
+        return Response({'message':'product deleted successfully'},status=200)
+    except Exception as e:
+        return Response({'error':str(e)},status=400)
+    
+    
