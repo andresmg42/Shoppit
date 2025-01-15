@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from .models import Product,Cart,CartItem
 from .serializers import ProductSerializer,DetailedProductSerializer,CartItemSerializer,SimpleCartSerializer,CartSerializer
 from rest_framework.response import Response
 from core.models import CustomUser
+from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(['GET'])
@@ -98,4 +99,9 @@ def delete_item(request):
     except Exception as e:
         return Response({'error':str(e)},status=400)
     
-    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_username(request):
+    user=request.user
+    return Response({'username':user.username})
+   
