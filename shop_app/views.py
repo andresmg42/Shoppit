@@ -1,10 +1,14 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view,permission_classes
-from .models import Product,Cart,CartItem
-from .serializers import ProductSerializer,DetailedProductSerializer,CartItemSerializer,SimpleCartSerializer,CartSerializer
+from .models import Product,Cart,CartItem,Transaction
+from .serializers import ProductSerializer,DetailedProductSerializer,CartItemSerializer,SimpleCartSerializer,CartSerializer,UserSerializer
 from rest_framework.response import Response
 from core.models import CustomUser
 from rest_framework.permissions import IsAuthenticated
+from decimal import Decimal
+from django.conf import settings
+import uuid
+BASE_URL='http://localhost:5173'
 
 
 @api_view(['GET'])
@@ -105,3 +109,55 @@ def get_username(request):
     user=request.user
     return Response({'username':user.username})
    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_info(request):
+    user=request.user
+    serializer=UserSerializer(user)
+    return Response(serializer.data)
+
+def initiate_payment(request):
+    if request.user:
+        try:
+            tx_ref=str(uuid.uuid4())
+            cart_code=request.data.get('cart_code')
+            cart=Cart.objects.get(cart_code=cart_code)
+            user=request.user
+            
+            amount=sum([item.quantity * item.product.price for item in cart.items.all()])
+            tax=Decimal('4.00')
+            total_amount=amount + tax
+            currency='COP'
+            redirect_url=f'{BASE_URL}/payment-status/'
+            
+            transaction=Transaction.objects.create(
+                ref=tx_ref,
+                cart=cart,
+                amount=total_amount,
+                currency=currency,
+                user=user,
+                status='pending'
+                
+            )
+            
+            flutterwave_payload={
+                'tx_ref':tx_ref,
+                'amount':str(total_amount),
+                'currency':currency,
+                'redirect_url':redirect_url,
+                'customer':{
+                    'email':user.email,
+                    'name':user.username,
+                    'phonenumber':user.phone
+                },
+                'customizations':{
+                    'title':'Shoppit Payment'
+                }
+            }
+            
+            headers={
+                'Authorization':f'Bearer {settings.FLUTTERWAVE_SECRET_KEY}',
+                'Content-type': 'application/json'
+            }
+            

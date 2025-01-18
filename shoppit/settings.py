@@ -149,3 +149,5 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
 }
+
+'clave flutterwave=SE@JT5rbdW9szY.'
