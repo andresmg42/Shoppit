@@ -7,7 +7,9 @@ from core.models import CustomUser
 from rest_framework.permissions import IsAuthenticated
 from decimal import Decimal
 from django.conf import settings
+from rest_framework import status
 import uuid
+import requests
 BASE_URL='http://localhost:5173'
 
 
@@ -117,6 +119,8 @@ def user_info(request):
     serializer=UserSerializer(user)
     return Response(serializer.data)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def initiate_payment(request):
     if request.user:
         try:
@@ -158,6 +162,22 @@ def initiate_payment(request):
             
             headers={
                 'Authorization':f'Bearer {settings.FLUTTERWAVE_SECRET_KEY}',
-                'Content-type': 'application/json'
+                'Content-Type': 'application/json'
             }
+            
+            response=requests.post(
+                'https://api.flutterwave.com/v3/payments',
+                json=flutterwave_payload,
+                headers=headers
+            )
+            
+            if response.status_code==200:
+                return Response(response.json(),status=status.HTTP_200_OK)
+            else:
+                return Response(response.json(),status=response.status_code)
+            
+        except requests.exceptions.RequestException as e:
+            return Response({'error':str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            
             

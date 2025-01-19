@@ -150,4 +150,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
 }
 
+FLUTTERWAVE_SECRET_KEY='FLWSECK_TEST-f2aed69248d00a121c444e6a6e94e3fe-X'
+
 'clave flutterwave=SE@JT5rbdW9szY.'
