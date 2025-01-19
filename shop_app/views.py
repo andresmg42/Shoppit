@@ -132,7 +132,7 @@ def initiate_payment(request):
             amount=sum([item.quantity * item.product.price for item in cart.items.all()])
             tax=Decimal('4.00')
             total_amount=amount + tax
-            currency='COP'
+            currency='NGN'
             redirect_url=f'{BASE_URL}/payment-status/'
             
             transaction=Transaction.objects.create(
@@ -179,5 +179,49 @@ def initiate_payment(request):
         except requests.exceptions.RequestException as e:
             return Response({'error':str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
+    
+@api_view(['POST'])
+def payment_callback(request):
+    status=request.GET.get('status')
+    tx_ref=request.GET.get('tx_ref')
+    transaction_id=request.GET.get('transaction_id')
+    user=request.user
+    
+    if status == 'successful':
+        headers={
+            'Authorization':f'Bearer{settings.FLUTTERWAVE_SECRET_KEY}'
+        }
+        
+        response=requests.get(
+            f'https://api.flutterwave.com/v3/transactions/{transaction_id}/verify',
+            headers=headers
+                              
+                              )
+        
+        response_data=response.json()
+        
+        if response_data['status']=='success':
+            transaction=Transaction.objects.get(ref=tx_ref)
+            if(response_data['data']['status']=='successful'
+               and float(response_data['data']['amount']==float(transaction.amount))
+               and response_data['data']['currency']==transaction.currency
+               ):
+                
+                transaction.status='completed'
+                transaction.save()
+                
+                cart=transaction.cart
+                cart.paid=True
+                cart.user=user
+                cart.save()
+                
+                return Response({'message':'payment successful!','subMessage':'you have successfully made payment'})
+            else:
+                return Response({'message':'Payment verification failed','subMessage':'your payment virification failed'})
             
+        else:
+            return Response({'message':'Failed to verify transaction with flutterwave','subMessge':'we cound not to verify transaction with flutterwave'})
             
+    
+    else:
+        return Response({'message':'Payment was not successful'},status=400)    
