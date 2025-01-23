@@ -187,9 +187,11 @@ def payment_callback(request):
     transaction_id=request.GET.get('transaction_id')
     user=request.user
     
+    
     if status == 'successful':
         headers={
-            'Authorization':f'Bearer{settings.FLUTTERWAVE_SECRET_KEY}'
+            'Authorization':f'Bearer {settings.FLUTTERWAVE_SECRET_KEY}',
+            
         }
         
         response=requests.get(
@@ -199,6 +201,7 @@ def payment_callback(request):
                               )
         
         response_data=response.json()
+        print(response_data)
         
         if response_data['status']=='success':
             transaction=Transaction.objects.get(ref=tx_ref)
