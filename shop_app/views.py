@@ -10,7 +10,15 @@ from django.conf import settings
 from rest_framework import status
 import uuid
 import requests
+import paypalrestsdk
+
 BASE_URL='http://localhost:5173'
+
+paypalrestsdk.configure({
+    'mode':settings.PAYPAL_MODE,
+    'client_id':settings.PAYPAL_CLIENT_ID,
+    'client_secret':settings.PAYPAL_CLIENT_SECRET
+})
 
 
 @api_view(['GET'])
