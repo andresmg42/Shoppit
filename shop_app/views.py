@@ -40,8 +40,9 @@ def add_item(request):
         cart_code=request.data.get('cart_code')
         product_id=request.data.get('product_id')
         
-        user=CustomUser.objects.get(id=1)
-        cart,created=Cart.objects.get_or_create(cart_code=cart_code,user=user) #QUITAR USER ID CUANDO SE HAGA EL LOGIN
+        #user=CustomUser.objects.get(id=1)
+        #user=request.user
+        cart,created=Cart.objects.get_or_create(cart_code=cart_code) #QUITAR USER ID CUANDO SE HAGA EL LOGIN
         print(created)
         product=Product.objects.get(id=product_id)
         
