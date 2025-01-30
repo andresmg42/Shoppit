@@ -168,6 +168,11 @@ PAYPAL_MODE='sandbox'
 REACT_BASE_URL=os.getenv('REACT_BASE_URL','http://localhost:5173')
 
 STORAGES = {
+    
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
