@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -122,6 +128,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL='img/'
 MEDIA_ROOT=BASE_DIR/'media'
 
@@ -157,3 +164,11 @@ PAYPAL_CLIENT_ID='AQWW07cEowrIKuF8pJEHB7g_JwsOZJkBmj2zk02r_D_2_QY7em_ZaO4YL8hkDJ
 PAYPAL_CLIENT_SECRET='EDYD1tTm5nLbJ9uFoEWvHDoHPFGQAenZMI0hrIAW_WMbO4fYyt9CWIh8Nck-QC1rDbDgfZ0--T2MOnBa'
 
 PAYPAL_MODE='sandbox'
+
+REACT_BASE_URL=os.getenv('REACT_BASE_URL','http://localhost:5173')
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}

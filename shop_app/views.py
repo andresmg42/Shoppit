@@ -12,7 +12,7 @@ import uuid
 import requests
 import paypalrestsdk
 
-BASE_URL='http://localhost:5173'
+BASE_URL=settings.REACT_BASE_URL
 
 paypalrestsdk.configure({
     'mode':settings.PAYPAL_MODE,
