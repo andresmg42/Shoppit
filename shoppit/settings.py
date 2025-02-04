@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'core',
     'shop_app',
-    'rest_framework'
+    'rest_framework',
+    "django_recaptcha"
+    
 ]
 
 MIDDLEWARE = [
@@ -178,3 +180,6 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+RECAPTCHA_PUBLIC_KEY='6Lf0yMsqAAAAAG8JDEUGRLgvjBJL8x44-FFlMJA_'
+RECAPTCHA_PRIVATE_KEY='6Lf0yMsqAAAAAL_jRwnHBCyL2__yTZaFOyc8FMZE'

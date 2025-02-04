@@ -109,8 +109,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = [
-            "id",
             "username",
+            'password',
             "first_name",
             "last_name",
             "email",
@@ -119,6 +119,9 @@ class UserSerializer(serializers.ModelSerializer):
             "address",
             "phone",
             "items",
+            'is_staff',
+            'is_superuser',
+            'is_active'
         ]
 
     def get_items(self, user):

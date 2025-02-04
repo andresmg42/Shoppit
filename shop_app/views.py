@@ -11,6 +11,8 @@ from rest_framework import status
 import uuid
 import requests
 import paypalrestsdk
+from django_recaptcha.fields import ReCaptchaField
+from django.core.exceptions import ValidationError
 
 BASE_URL=settings.REACT_BASE_URL
 
@@ -329,3 +331,30 @@ def paypal_payment_callback(request):
         return Response({'error':'Invalid payment details'},status=400)
     
 
+@api_view(['POST'])
+def register_user(request):
+    data=request.data
+    
+    captcha=data['captcha']
+    
+    recaptcha_field=ReCaptchaField()
+    
+    try:
+        recaptcha_field.validate(captcha)
+    except ValidationError :
+        return Response({'success':False,'error':'CAPTCHA invalido'},status=400)
+    
+    usuario=data['user']
+    usuario['is_staff']=False
+    usuario['is_superuser']=False
+    usuario['is_active']=True
+    serializer=UserSerializer(data=usuario)
+    if serializer.is_valid():
+        serializer.save()
+        user= CustomUser.objects.get(username=serializer.data['username'])
+        user.set_password(serializer.data['password'])
+        user.save()
+        #send_verification_email(user)
+        return Response({'message':'success register'},status=200)
+    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        
