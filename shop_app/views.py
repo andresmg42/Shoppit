@@ -355,6 +355,6 @@ def register_user(request):
         user.set_password(serializer.data['password'])
         user.save()
         #send_verification_email(user)
-        return Response({'message':'success register'},status=200)
+        return Response({'username':serializer.data['username'],'password':serializer.data['password']},status=200)
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
