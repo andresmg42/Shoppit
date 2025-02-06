@@ -357,4 +357,4 @@ def register_user(request):
         #send_verification_email(user)
         return Response({'username':serializer.data['username'],'password':serializer.data['password']},status=200)
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        
+         
